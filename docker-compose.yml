@@ -1,0 +1,12 @@
+version: "3.8"
+services:
+    db: # db 서비스
+        container_name: h2
+        image: oscarfonts/h2:latest
+        ports:
+            - 1521:1521 # TCP 포트 : 데이터베이스 연결 포트
+            - 8081:81 # HTTP 포트 : 웹콘솔 연결 포트
+        environment:
+            H2_OPTIONS: "-ifNotExists -webAllowOthers -tcpAllowOthers"
+        volumes:
+            - ./h2/:/opt/h2-data # host 서버와 연결되는 통로 ( 저장 및 백업 경로 )
