@@ -3,6 +3,8 @@ package com.playground.springbatchmparam1.config;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepScope;
+import org.springframework.batch.core.converter.JobParametersConverter;
+import org.springframework.batch.core.converter.JsonJobParametersConverter;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
@@ -14,7 +16,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
 
-// ./gradlew bootRun --args='--spring.batch.job.name=processTerminatorJob terminatorId=TEST,java.lang.String targetCount=5,java.lang.Integer' 으로 작업 실행시키기
+// .\gradlew bootRun --args="--spring.batch.job.name=processTerminatorJob terminatorId=TEST,java.lang.String targetCount=5,java.lang.Integer" 으로 작업 실행시키기
 
 
 @Configuration
@@ -62,5 +64,8 @@ public class SystemTerminationConfig {
             return RepeatStatus.FINISHED;
         };
     }
+
+
+
 
 }
