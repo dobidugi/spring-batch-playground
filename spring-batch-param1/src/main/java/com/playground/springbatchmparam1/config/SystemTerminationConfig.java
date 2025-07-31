@@ -1,5 +1,6 @@
 package com.playground.springbatchmparam1.config;
 
+import com.playground.springbatchmparam1.batch.BatchParameterValidator;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepScope;
@@ -16,7 +17,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
 
-// .\gradlew bootRun --args="--spring.batch.job.name=processTerminatorJob terminatorId=TEST,java.lang.String targetCount=5,java.lang.Integer" 으로 작업 실행시키기
+// .\gradlew bootRun --args="--spring.batch.job.name=processTerminatorJob terminatorId=TEST,java.lang.String targetCount=5,java.lang.Long" 으로 작업 실행시키기
 
 
 @Configuration
@@ -31,8 +32,9 @@ public class SystemTerminationConfig {
     }
 
     @Bean
-    public Job processTerminatorJob(JobRepository jobRepository, Step terminationStep) {
+    public Job processTerminatorJob(JobRepository jobRepository, Step terminationStep, BatchParameterValidator batchParameterValidator) {
         return new JobBuilder("processTerminatorJob", jobRepository)
+                .validator(batchParameterValidator) // JobParametersValidator를 사용하여 파라미터 검증
                 .start(terminationStep)
                 .build();
     }
