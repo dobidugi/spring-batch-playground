@@ -6,6 +6,7 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.batch.core.converter.JsonJobParametersConverter;
+import org.springframework.batch.core.job.DefaultJobParametersValidator;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
@@ -34,7 +35,11 @@ public class SystemTerminationConfig {
     @Bean
     public Job processTerminatorJob(JobRepository jobRepository, Step terminationStep, BatchParameterValidator batchParameterValidator) {
         return new JobBuilder("processTerminatorJob", jobRepository)
-                .validator(batchParameterValidator) // JobParametersValidator를 사용하여 파라미터 검증
+//                .validator(batchParameterValidator) // JobParametersValidator를 사용하여 파라미터 검증
+                .validator(new DefaultJobParametersValidator(
+                        new String[]{"terminatorId", "targetCount"}, // 필수 파라미터
+                        new String[]{} // 선택적 파라미터는 없음
+                ))
                 .start(terminationStep)
                 .build();
     }
