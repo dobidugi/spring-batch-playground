@@ -15,6 +15,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import java.util.List;
+
 
 // .\gradlew bootRun --args="--spring.batch.job.name=somethingJob" 으로 작업 실행시키기
 
@@ -44,20 +46,28 @@ public class JobConfiguration {
 
 
     @Bean
-    public Job Somethingjob(JobRepository jobRepository, Step somethingStep) {
+    public Job Somethingjob(JobRepository jobRepository, Step somethingStep, Step finalStep) {
         return new JobBuilder("somethingJob", jobRepository)
                 .start(somethingStep)
+                .next(finalStep)
 //                .listener(somethingJobExecutionListener)
                 .listener(annotationBasedJobExecutionListener) // Annotation 기반 JobExecutionListener 사용
                 .build();
     }
 
     @Bean
-    public Step somethingStep(JobRepository jobRepository, PlatformTransactionManager transactionManager, Tasklet somethingTasklet, Tasklet tasklet) {
+    public Step somethingStep(JobRepository jobRepository, PlatformTransactionManager transactionManager, Tasklet somethingTasklet) {
         return new StepBuilder("somethingStep", jobRepository)
-                .tasklet(tasklet, transactionManager)
+                .tasklet(somethingTasklet, transactionManager)
 //                .listener(somethingStepExecutionListener)
                 .listener(annotationBasedStepExecutionListener) // Annotation 기반 StepExecutionListener 사용
+                .build();
+    }
+
+    @Bean
+    public Step finalStep(JobRepository jobRepository, PlatformTransactionManager transactionManager, Tasklet finalTasklet) {
+        return new StepBuilder("finalStep", jobRepository)
+                .tasklet(finalTasklet, transactionManager)
                 .build();
     }
 
@@ -65,7 +75,19 @@ public class JobConfiguration {
     public Tasklet somethingTasklet() {
         return (contribution, chunkContext) -> {
             // Tasklet logic goes here
+            List<String> contextList = (List<String>) chunkContext.getStepContext().getStepExecution().getJobExecution().getExecutionContext().get("contextData");
             System.out.println("Executing somethingTasklet");
+            System.out.println("Context Data: " + contextList);
+            return RepeatStatus.FINISHED;
+        };
+    }
+
+    @Bean
+    public Tasklet finalTasklet() {
+        return (contribution, chunkContext) -> {
+            // Final Tasklet logic goes here
+            System.out.println("Call finalTasklet");
+            contribution.getStepExecution().getJobExecution().getExecutionContext().put("finalData", "Final Tasklet Data");
             return RepeatStatus.FINISHED;
         };
     }
