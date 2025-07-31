@@ -1,5 +1,7 @@
 package com.playground.springbatchjoblistener.config;
 
+import com.playground.springbatchjoblistener.batch.AnnotationBasedJobExecutionListener;
+import com.playground.springbatchjoblistener.batch.AnnotationBasedStepExecutionListener;
 import com.playground.springbatchjoblistener.batch.SomethingJobExecutionListener;
 import com.playground.springbatchjoblistener.batch.SomethingStepExecutionListener;
 import org.springframework.batch.core.Job;
@@ -23,22 +25,30 @@ public class JobConfiguration {
     private final PlatformTransactionManager transactionManager;
     private final SomethingJobExecutionListener somethingJobExecutionListener;
     private final SomethingStepExecutionListener somethingStepExecutionListener;
+    private final AnnotationBasedJobExecutionListener annotationBasedJobExecutionListener;
+    private final AnnotationBasedStepExecutionListener annotationBasedStepExecutionListener;
 
     public JobConfiguration(
             JobRepository jobRepository, PlatformTransactionManager transactionManager,
-            SomethingJobExecutionListener somethingJobExecutionListener, SomethingStepExecutionListener somethingStepExecutionListener
+            SomethingJobExecutionListener somethingJobExecutionListener, SomethingStepExecutionListener somethingStepExecutionListener,
+            AnnotationBasedStepExecutionListener annotationBasedStepExecutionListener, AnnotationBasedJobExecutionListener annotationBasedJobExecutionListener
     ) {
         this.jobRepository = jobRepository;
         this.transactionManager = transactionManager;
         this.somethingJobExecutionListener = somethingJobExecutionListener;
         this.somethingStepExecutionListener = somethingStepExecutionListener;
+        this.annotationBasedJobExecutionListener = annotationBasedJobExecutionListener;
+        this.annotationBasedStepExecutionListener = annotationBasedStepExecutionListener;
     }
+
+
 
     @Bean
     public Job Somethingjob(JobRepository jobRepository, Step somethingStep) {
         return new JobBuilder("somethingJob", jobRepository)
                 .start(somethingStep)
-                .listener(somethingJobExecutionListener)
+//                .listener(somethingJobExecutionListener)
+                .listener(annotationBasedJobExecutionListener) // Annotation 기반 JobExecutionListener 사용
                 .build();
     }
 
@@ -46,7 +56,8 @@ public class JobConfiguration {
     public Step somethingStep(JobRepository jobRepository, PlatformTransactionManager transactionManager, Tasklet somethingTasklet, Tasklet tasklet) {
         return new StepBuilder("somethingStep", jobRepository)
                 .tasklet(tasklet, transactionManager)
-                .listener(somethingStepExecutionListener)
+//                .listener(somethingStepExecutionListener)
+                .listener(annotationBasedStepExecutionListener) // Annotation 기반 StepExecutionListener 사용
                 .build();
     }
 
