@@ -6,11 +6,13 @@ import com.playground.springbatchjoblistener.batch.SomethingJobExecutionListener
 import com.playground.springbatchjoblistener.batch.SomethingStepExecutionListener;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -72,10 +74,12 @@ public class JobConfiguration {
     }
 
     @Bean
-    public Tasklet somethingTasklet() {
+    @StepScope
+    public Tasklet somethingTasklet(
+            @Value("#{jobExecutionContext['contextData']}") List<String> contextList
+    ) {
         return (contribution, chunkContext) -> {
             // Tasklet logic goes here
-            List<String> contextList = (List<String>) chunkContext.getStepContext().getStepExecution().getJobExecution().getExecutionContext().get("contextData");
             System.out.println("Executing somethingTasklet");
             System.out.println("Context Data: " + contextList);
             return RepeatStatus.FINISHED;

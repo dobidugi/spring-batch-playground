@@ -4,8 +4,6 @@ import com.playground.springbatchmparam1.batch.BatchParameterValidator;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepScope;
-import org.springframework.batch.core.converter.JobParametersConverter;
-import org.springframework.batch.core.converter.JsonJobParametersConverter;
 import org.springframework.batch.core.job.DefaultJobParametersValidator;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
