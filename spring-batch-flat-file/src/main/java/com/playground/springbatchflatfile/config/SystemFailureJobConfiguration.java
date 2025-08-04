@@ -12,6 +12,7 @@ import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
+import org.springframework.batch.item.file.transform.Range;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -52,6 +53,30 @@ public class SystemFailureJobConfiguration {
 
     }
 
+    // csv 파일 읽기
+//    @Bean
+//    @StepScope
+//    public FlatFileItemReader<?> systemFailureItemReader(
+//            @Value("#{jobParameters['fileName']}") String fileName
+//    ) {
+//        return new FlatFileItemReaderBuilder<SystemFailure>()
+//                .name("systemFailureItemReader")
+//                .resource(new FileSystemResource(fileName))
+//                .delimited() // 구분자 기반 파일 읽기 활성화
+//                .delimiter(",") // 구분자
+//                .names(
+//                        "errorId",
+//                        "errorDateTime",
+//                        "severity",
+//                        "processId",
+//                        "errorMessage"
+//                )
+//                .targetType(SystemFailure.class)
+//                .linesToSkip(1) // 헤더 처리
+//                .build();
+//    }
+
+    // 고정된 형식의 파일 읽기
     @Bean
     @StepScope
     public FlatFileItemReader<?> systemFailureItemReader(
@@ -60,17 +85,17 @@ public class SystemFailureJobConfiguration {
         return new FlatFileItemReaderBuilder<SystemFailure>()
                 .name("systemFailureItemReader")
                 .resource(new FileSystemResource(fileName))
-                .delimited() // 구분자 기반 파일 읽기 활성화
-                .delimiter(",") // 구분자
-                .names(
-                        "errorId",
-                        "errorDateTime",
-                        "severity",
-                        "processId",
-                        "errorMessage"
-                )
+                .fixedLength() //  고정한 형식으로 읽기 활성화
+                .columns(new Range[]{
+                        new Range(1, 8),     // errorId: ERR001 + 공백 2칸
+                        new Range(9, 29),    // errorDateTime: 날짜시간 + 공백 2칸
+                        new Range(30, 39),   // severity: CRITICAL/FATAL + 패딩
+                        new Range(40, 45),   // processId: 1234 + 공백 2칸
+                        new Range(46, 66)    // errorMessage: 메시지 + \n
+                })
+                .names("errorId", "errorDateTime", "severity", "processId", "errorMessage")
                 .targetType(SystemFailure.class)
-                .linesToSkip(1) // 헤더 처리
+                .strict(false)
                 .build();
     }
 
