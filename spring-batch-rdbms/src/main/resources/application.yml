@@ -1,0 +1,19 @@
+
+spring:
+  application:
+    name: spring-batch-rdbms
+  sql:
+    init:
+      mode: always
+  batch:
+    jdbc:
+      initialize-schema: always
+  datasource:
+    url: jdbc:mysql://localhost:3306/batch
+    driver-class-name: com.mysql.jdbc.Driver
+    username: root
+    password: insight5688
+
+logging:
+  level:
+    org.springframework.batch.item.database: DEBUG
