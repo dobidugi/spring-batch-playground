@@ -1,12 +1,10 @@
 package com.playground.rdbms.batch;
 
+import com.playground.rdbms.entity.BlockedPost;
 import com.playground.rdbms.entity.Post;
 import com.playground.rdbms.entity.Report;
 import jakarta.persistence.EntityManagerFactory;
-import lombok.Builder;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -17,7 +15,9 @@ import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.JpaCursorItemReader;
+import org.springframework.batch.item.database.JpaItemWriter;
 import org.springframework.batch.item.database.builder.JpaCursorItemReaderBuilder;
+import org.springframework.batch.item.database.builder.JpaItemWriterBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,7 +25,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
@@ -84,34 +83,29 @@ public class PostBlockBatchConfig {
     }
 
     @Bean
-    public ItemWriter<BlockedPost> postBlockWriter() {
-        return items -> {
-            items.forEach(blockedPost -> {
-                log.info("💀 TERMINATED: [ID:{}] '{}' by {} | 신고:{}건 | 점수:{} | kill -9 at {}",
-                        blockedPost.getPostId(),
-                        blockedPost.getTitle(),
-                        blockedPost.getWriter(),
-                        blockedPost.getReportCount(),
-                        String.format("%.2f", blockedPost.getBlockScore()),
-                        blockedPost.getBlockedAt().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
-            });
-        };
+    public JpaItemWriter<BlockedPost> postBlockWriter() {
+        return new JpaItemWriterBuilder<BlockedPost>()
+                .entityManagerFactory(entityManagerFactory)
+                .usePersist(true) // 신규면 persist true , 수정 이면 merge false
+                .build();
     }
 
-    /**
-     * 차단된 게시글
-     */
-    @Getter
-    @Builder
-    @ToString
-    public static class BlockedPost {
-        private Long postId;
-        private String writer;
-        private String title;
-        private int reportCount;
-        private double blockScore;
-        private LocalDateTime blockedAt;
-    }
+//
+//    @Bean
+//    public ItemWriter<BlockedPost> postBlockWriter() {
+//        return items -> {
+//            items.forEach(blockedPost -> {
+//                log.info("💀 TERMINATED: [ID:{}] '{}' by {} | 신고:{}건 | 점수:{} | kill -9 at {}",
+//                        blockedPost.getPostId(),
+//                        blockedPost.getTitle(),
+//                        blockedPost.getWriter(),
+//                        blockedPost.getReportCount(),
+//                        String.format("%.2f", blockedPost.getBlockScore()),
+//                        blockedPost.getBlockedAt().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
+//            });
+//        };
+//    }
+
 
     @Component
     public static class PostBlockProcessor implements ItemProcessor<Post, BlockedPost> {
