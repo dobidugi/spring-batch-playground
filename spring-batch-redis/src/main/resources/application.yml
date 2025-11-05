@@ -1,30 +1,9 @@
 
 spring:
-  application:
-    name: spring-batch-rdbms
-  sql:
-    init:
-      mode: always
-  batch:
-    jdbc:
-      initialize-schema: always
-  datasource:
-    url: jdbc:mysql://localhost:3306/batch
-    driver-class-name: com.mysql.jdbc.Driver
-    username: root
-    password: insight5688
-
-  jpa:
-    hibernate:
-      ddl-auto: update
-
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-        highlight_sql: true
-        dialect: org.hibernate.dialect.MySQL8Dialect
-
+  data:
+    redis:
+      host: localhost
+      port: 6379
 logging:
   level:
     org.springframework.batch.item.database: DEBUG
