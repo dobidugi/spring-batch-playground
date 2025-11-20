@@ -1,10 +1,10 @@
-package com.ark.batchsystem;
+package com.playground.json;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class BatchSystemApplicationTests {
+class SpringBatchmParam1ApplicationTests {
 
     @Test
     void contextLoads() {

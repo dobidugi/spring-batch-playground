@@ -1,13 +1,14 @@
-package com.ark.batchsystem;
+package com.playground.rest.api;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class BatchSystemApplication {
+
+public class SpringBatchRestApi {
 
     public static void main(String[] args) {
-        SpringApplication.run(BatchSystemApplication.class, args);
+        SpringApplication.run(SpringBatchRestApi.class, args);
     }
 
 }
